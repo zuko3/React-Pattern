@@ -42,7 +42,7 @@ class Tabs extends React.Component {
   _renderContent = () => {
     return (
       <div>
-        {this.props.children.map((child, index) => this.state.selected === index ? child.props.children : null)}
+        {this.props.children[this.state.selected].props.children}
       </div>
     );
   }
