@@ -1,20 +1,11 @@
 import React, { Component } from 'react';
-/**
- * This will come from some library
- */
-const Switch = (props) => (
-  <React.Fragment>
-    {props.on ? <p>I am On</p> : <p>I am Off</p>}
-    <button onClick={props.onClick}>{props.on ? "Switch ON" : "Switch OFF"}</button>
-  </React.Fragment>
-)
+import { render } from 'react-dom';
+import Hello from './Hello';
+import './style.css';
 
-
-/**
- * give rendering control to users with prop getters
- */
-
-const callAll = (...fn) => (...args) => fn.forEach(fn => fn && fn(...args));
+const callAll = (...fn) => (...args) => fn.forEach(fn => {
+  typeof fn === "function" && fn(...args)
+});
 
 class Toggle extends React.Component {
   constructor(props) {
@@ -23,44 +14,44 @@ class Toggle extends React.Component {
       on: false
     }
   }
+  _toggle = () => this.setState({
+    on: !this.state.on
+  })
 
-  _toggle = () =>
-    this.setState({
-      on: !this.state.on
-    }) 
-
-  _getStateAndHelpers = () =>{
-    return{
-      on:this.state.on,
-      toggle:this._toggle,
-      togglerProps: this._getTogglerProps
-    }
+  _getClickHandlerProps = ({ onClick, ...rest } = {}) => {
+    return ({
+      onClick: callAll(this, onClick, this._toggle),
+      ...rest
+    })
   }
 
-  _getTogglerProps =({onClick,...props}={})=>({
-      onClick:callAll(onClick,this._toggle),
-      ...props
+  _getStateProps = () => {
+    return ({
+      on: this.state.on,
+      togglerProps: this._getClickHandlerProps
     })
+  }
 
   render() {
-    return this.props.children(this._getStateAndHelpers())
+    return this.props.children(this._getStateProps())
   }
 }
 
-const App = () => (
-  <Toggle>
-    {({ on, togglerProps }) =>{
-      return (
-      <div>
-        {on ? <p>I am on</p> : <p>I am off</p>}
-        <Switch {...togglerProps({on})} />
-        <button {...togglerProps({
-          onClick:()=>console.log("Button clicked")
-        })}>{on ? "ON" : "OFF"}</button>
-      </div>
-    )}}
-  </Toggle>
-)
-
-
-export default App;
+function App() {
+  return (
+    <div>
+      <Toggle>
+        {({ on, togglerProps }) => (
+          <div>
+            {on ? <p>I am on</p> : <p>I am off</p>}
+            <button {...togglerProps({
+              onClick: () => console.log("+++++ ButtonClicked"),
+              tabIndex: 0
+            })}>{on ? "ON" : "OFF"}</button>
+          </div>
+        )}
+      </Toggle>
+    </div>
+  )
+}
+render(<App />, document.getElementById('root'));
