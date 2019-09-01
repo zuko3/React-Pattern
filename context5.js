@@ -43,7 +43,7 @@ class App extends React.Component {
     }
     return(
       <ThemeContext.Provider value={contextVal}>
-        <ToolBar toogleTheme={this._toggleTheme}/>
+        <ToolBar/>
       </ThemeContext.Provider>
     )
   }
