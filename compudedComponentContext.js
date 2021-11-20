@@ -1,50 +1,53 @@
 import React, { Component } from 'react';
 
-const ToogleContext = React.createContext();
+const AppContext = React.createContext();
 
-class Toggle extends Component {
+class Toggle extends React.Component {
   state = { on: false };
-  static On = (props) => (<ToogleContext.Consumer>
-    {(context) => context.on ? props.children : null}
-  </ToogleContext.Consumer>);
+  static On = (props) => (
+    <AppContext.Consumer>
+      {({ on }) => (on ? props.children : null)}
+    </AppContext.Consumer>
+  );
+  static Off = (props) => (
+    <AppContext.Consumer>
+      {({ on }) => (on ? null : props.children)}
+    </AppContext.Consumer>
+  );
+  static Button = (props) => (
+    <AppContext.Consumer>
+      {({ toggle }) => <button onClick={toggle}>toggle</button>}
+    </AppContext.Consumer>
+  );
 
-  static Off = (props) => (<ToogleContext.Consumer>
-    {(context) => context.on ? null : props.children}
-  </ToogleContext.Consumer>)
-
-  static Button = (props) => {
-    return (
-      <ToogleContext.Consumer>
-        {(context) => <button onClick={() => context.toggle()}>{context.on ? 'On' : 'OFF'}</button>}
-      </ToogleContext.Consumer>
-    )
-  }
-
-  toggle = () => {
+  toggle = () =>
     this.setState({
-      on: !this.state.on
-    })
-  }
+      on: !this.state.on,
+    });
+
   render() {
-    return <ToogleContext.Provider {...this.props} value={{
-      on: this.state.on,
-      toggle: this.toggle
-    }} />
+    return (
+      <AppContext.Provider
+        value={{
+          on: this.state.on,
+          toggle: this.toggle,
+        }}
+      >
+        {this.props.children}
+      </AppContext.Provider>
+    );
   }
 }
 
-const ToggleBtn = () => (
-  <Toggle>
-    <Toggle.On>I am On</Toggle.On>
-    <Toggle.Off>I am off</Toggle.Off>
-    <div>
-      <Toggle.Button />
-    </div>
-  </Toggle>
-)
-
-
-
-const App = () => <ToggleBtn />
-
+function App() {
+  return (
+    <Toggle>
+      <Toggle.On>I am On</Toggle.On>
+      <Toggle.Off>I am off</Toggle.Off>
+      <div>
+        <Toggle.Button />
+      </div>
+    </Toggle>
+  );
+}
 export default App;
